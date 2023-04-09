@@ -1,33 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react'
+import Header from "./components/Header"
+import Form from "./components/Form"
+import PatientList from "./components/PatientList"
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const [patients, setPatients] = useState([])
+  const [patient, setPatient] = useState({})
+
+  useEffect(() => {
+
+    const getDataFromLocalStorage = () => {
+      
+      const localStoragePatients = JSON.parse(localStorage.getItem('patients')) ?? []
+      console.log(localStoragePatients)
+      setPatients(localStoragePatients)
+    } 
+    
+    getDataFromLocalStorage()
+
+  }, [])
+
+  useEffect(() => {
+    console.log('hi')
+    localStorage.setItem('patients', JSON.stringify(patients))
+  }, [patients])
+
+  const deletePatient = (id) => {
+      const newPatients = patients.filter(p => p.id != id)
+      setPatients(newPatients)
+  }
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="container mx-auto mt-20">
+      <Header />
+      <div className="mt-12 md:flex">
+        <Form           
+          patients = {patients}
+          setPatients = {setPatients}   
+          patient = {patient}       
+          setPatient = {setPatient}
+        />
+        <PatientList 
+          patients = {patients}
+          setPatient = {setPatient}
+          deletePatient = {deletePatient}
+        />                
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      
     </div>
   )
 }
